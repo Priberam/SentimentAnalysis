@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{a6f87337-38c9-4ead-b25f-0d04125eb550}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>09_experiments_SA_Cision_Portuguese.py</StartupFile>
+    <StartupFile>sentiment_analysis.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -13,6 +13,8 @@
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <InterpreterId>MSBuild|venv|$(MSBuildProjectFullPath)</InterpreterId>
     <Name>sentiment_analysis</Name>
+    <CommandLineArguments>--train_config_path="train_config.json"</CommandLineArguments>
+    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
@@ -30,6 +32,9 @@
     <Content Include="train_config.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="core.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="nn_modules.py">
       <SubType>Code</SubType>
     </Compile>

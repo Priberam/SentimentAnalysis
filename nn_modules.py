@@ -1,3 +1,5 @@
+import torch
+cuda_available = torch.cuda.is_available()
 import torch.optim as optim
 import torch.nn.functional as F
 import torch.nn as nn
@@ -9,7 +11,8 @@ class GaussianNoise(nn.Module):
 
     def forward(self, din):
         if self.training:
-            return din + torch.autograd.Variable(torch.randn(din.size()).cuda() * self.stddev)
+            random = torch.randn(din.size()).cuda() if cuda_available else torch.randn(din.size())
+            return din + torch.autograd.Variable(random * self.stddev)
         return din
 
 # model inspired from http://aclweb.org/anthology/S17-2126

@@ -67,7 +67,7 @@ def main():
     if(REST): 
         web_server.run_server()
     elif(TRAIN): 
-        trainer.train()
+        trainer.train_all()
 
 if __name__ == "__main__":
     main()

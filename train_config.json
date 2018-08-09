@@ -1,17 +1,35 @@
 {
   "to_train_instances": [
     {
-      "name": "EN200Twitter",
+      "name": "EN300Twitter",
       "language": "EN",
-      "train_dataset_path": "Dataset/SemEval2017/Subtask_A/preprocesed/A_allyears_alldatasets_onlysemval_train90.preprocessed.tsv",
-      "dev_dataset_path": "Dataset/SemEval2017/Subtask_A/preprocesed/A_allyears_alldatasets_onlysemval_dev10.preprocessed.tsv",
-      "test_dataset_path": "Dataset/SemEval2017/Subtask_A/preprocesed/SemEval2017-task4-test.subtask-A.english.preprocessed.tsv",
-      "embeddings_path": "Embeddings/datastories.twitter.200d.txt",
-      "embeddings_size": 200,
+      "train_dataset_path": "Dataset/SemEval2017/Subtask_A/preprocessed/A_allyears_alldatasets_onlysemval_train90.preprocessed.tsv",
+      "dev_dataset_path": "Dataset/SemEval2017/Subtask_A/preprocessed/A_allyears_alldatasets_onlysemval_dev10.preprocessed.tsv",
+      "test_dataset_path": "Dataset/SemEval2017/Subtask_A/preprocessed/SemEval2017-task4-test.subtask-A.english.preprocessed.tsv",
+      "labels" : {
+        "positive": 0,
+        "neutral": 1,
+        "negative": 2
+      },
+      "embeddings_path": "Embeddings/datastories.twitter.300d.txt",
       "preprocessing_style": "twitter",
+      "hidden_dim": 150,      
+      "num_layers": 2,
+      "bidirectional": true,
+      "attention": "simple",
+      "noise": 0.3,
+      "final_layer": false,
+      "dropout_final": 0.5,
+      "dropout_attention": 0.5,
+      "dropout_words": 0.3,
+      "dropout_rnn": 0.3,
+      "dropout_rnn_u": 0.3,
+      "lr": 0.001,
+      "grad_clip": 1,
+      "n_epochs": 15,
+      "batch_size": 128,
       "save_in_REST_config": true,
-      "target_REST_config_path": "Rest_config.json"
+      "target_REST_config_path": "REST_config.json"
     }
   ]
 }
-

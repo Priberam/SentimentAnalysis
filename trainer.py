@@ -8,6 +8,7 @@ from tqdm import tqdm
 import numpy as np
 
 import torch
+cuda_available = torch.cuda.is_available()
 from torchtext import data, vocab
 import torch.optim as optim
 import torch.nn.functional as F
@@ -16,91 +17,60 @@ from nn_modules import GaussianNoise, RNN
 from sklearn.metrics import f1_score
 import random
 
+import core
 import __main__
 train_config=__main__.train_config
 
-def train():
-    EMBEDDINGS_PATH = args.embeddings
+def train_all():
+    for instance_to_train in train_config["to_train_instances"]:
+        train(instance_to_train)
+
+def train(config):
     # Load pre-trained embeddings
-    itos, vectors, dim = [], array.array(str('d')), None
-    count_embeddings= 0
-    max_vectors=1000000
-    with open(EMBEDDINGS_PATH, encoding="utf8") as fp:    
-        for line in fp:
-            count_embeddings+=1
-    with open(EMBEDDINGS_PATH, encoding="utf8") as fp:    
-        for index, line in enumerate(tqdm(fp, total=count_embeddings)):
-            if index > max_vectors:
-                break
-            # Explicitly splitting on " " is important, so we don't
-            # get rid of Unicode non-breaking spaces in the vectors.
-            entries = line.rstrip().split(" ")
-
-            word, entries = entries[0], entries[1:]
-            if dim is None and len(entries) > 1:
-                dim = len(entries)
-            elif dim != len(entries):
-                raise RuntimeError(
-                    "Vector for token {} has {} dimensions, but previously "
-                    "read vectors have {} dimensions. All vectors must have "
-                    "the same number of dimensions.".format(word, len(entries), dim))
-
-            vectors.extend(float(x) for x in entries)
-            itos.append(word)
-                
+    itos, stoi, vectors, dim = core.load_embeddings(config["embeddings_path"])
     #id to string: itos
     #string to id: stoi
-    stoi = {word: i for i, word in enumerate(itos)}
     vectors = torch.Tensor(vectors).view(-1, dim)
-
 
     # Load datasets
     TEXT = data.Field()
     LABEL = data.RawField()
-    train = data.TabularDataset(path=args.train_dataset, format='tsv',
+    train = data.TabularDataset(path=config["train_dataset_path"], format='tsv',
                                 fields=[('text', TEXT),
                                         ('label', LABEL)])
 
-
-    valid = data.TabularDataset(path=args.dev_dataset, format='tsv',
+    valid = data.TabularDataset(path=config["dev_dataset_path"], format='tsv',
                                 fields=[('text', TEXT),
                                         ('label', LABEL)])
 
-    test = data.TabularDataset(path=args.test_dataset, format='tsv',
+    test = data.TabularDataset(path=config["test_dataset_path"], format='tsv',
                                fields=[('text', TEXT),
                                        ('label', LABEL)])
-
     TEXT.build_vocab(train)
     TEXT.vocab.set_vectors(stoi, vectors, dim)
 
-
-
-    #ClassResclalingWeights = torch.Tensor([x, y, z])
-    #labels_vect = {'positive': 0, 'neutral': 1, 'negative': 2}
-
+    labels_vect = config["labels"]
 
     # parameters from DataStories system
     # http://aclweb.org/anthology/S17-2126
     INPUT_DIM = len(TEXT.vocab)
-    EMBEDDING_DIM = 300
-    HIDDEN_DIM = 150
-    OUTPUT_DIM = 3
-    N_LAYERS = 2
-    BIDIRECTIONAL = True
-    ATTENTION = "simple" #None, "simple"
-    NOISE = 0.3
-    FINAL_LAYER=False
-    DROPOUT_FINAL=0.5
-    DROPOUT_ATTENTION=0.5
-    DROPOUT_WORDS=0.3
-    DROPOUT_RNN=0.3
-    DROPOUT_RNN_U=0.3
-    LR=0.001
-    GRAD_CLIP=1
-
-    N_EPOCHS = 15
-    BATCH_SIZE = 128
-
+    EMBEDDING_DIM = dim
+    HIDDEN_DIM = config["hidden_dim"]
+    OUTPUT_DIM = len(labels_vect.keys())
+    N_LAYERS = config["num_layers"]
+    BIDIRECTIONAL = config["bidirectional"]
+    ATTENTION = config["attention"]
+    NOISE = config["noise"]
+    FINAL_LAYER= config["final_layer"]
+    DROPOUT_FINAL= config["dropout_final"]
+    DROPOUT_ATTENTION= config["dropout_attention"]
+    DROPOUT_WORDS= config["dropout_words"]
+    DROPOUT_RNN= config["dropout_rnn"]
+    DROPOUT_RNN_U= config["dropout_rnn_u"]
+    LR= config["lr"]
+    GRAD_CLIP= config["grad_clip"]
+    N_EPOCHS = config["n_epochs"]
+    BATCH_SIZE = config["batch_size"]
 
     model = RNN(INPUT_DIM, 
                 EMBEDDING_DIM, 
@@ -123,11 +93,10 @@ def train():
     device = torch.device('cuda' if cuda_available else 'cpu')
     model = model.to(device)
 
-    criterion = nn.NLLLoss()#(weight=ClassResclalingWeights)
+    criterion = nn.NLLLoss()
     criterion = criterion.to(device)
 
     optimizer = optim.Adam(model.parameters(), lr=LR)
-
 
     # Batches!    
     train_iter, valid_iter, test_iter = data.BucketIterator.splits(
@@ -136,10 +105,7 @@ def train():
         sort_key=lambda x: len(x.text),
         shuffle=True,
         repeat=False)
-
-    labels_vect = {'positive': 0, 'neutral': 1, 'negative': 2}
     
-
     highest_value_f1=0.0
     best_epoch=0
     best_model=""
@@ -207,12 +173,41 @@ def train():
         val_f1 = f1_score(labels, pred, average='macro', labels=[labels_vect['positive'], labels_vect['negative']])
     
         print(f'Epoch: {epoch+1:02}, Train Loss: {sum(train_loss)/len(train_loss):.3f}, Train F1:   {train_f1:.3f}, Val F1:{val_f1:.3f}')
-        torch.save(model, f'Models/english-epoch{epoch+1:02}-{val_f1:.3f}.pt')
         if val_f1 >highest_value_f1:
+            #save current best model
+            torch.save(model, 'Models/'+config["name"]+f'-epoch{epoch+1:02}-{val_f1:.3f}.pt')
             highest_value_f1=val_f1
             best_epoch=epoch
-            best_model=f'Models/english-epoch{epoch+1:02}-{val_f1:.3f}.pt'
+            #delete previous best model
+            if best_model!="" and os.path.isfile(best_model):
+                os.remove(best_model)
+            best_model='Models/'+config["name"]+f'-epoch{epoch+1:02}-{val_f1:.3f}.pt'
 
+    print("\n\nbest_model: ", best_model, "\n")
+
+    if config["save_in_REST_config"]==True:
+        if os.path.isfile(config["target_REST_config_path"]):   
+            with open(config["target_REST_config_path"], 'r') as fp:
+                target_config = json.load(fp) 
+            new_instance={}
+            new_instance["name"]=config["name"]
+            new_instance["language"]=config["language"]
+            new_instance["embeddings_path"]=config["embeddings_path"]
+            new_instance["preprocessing_style"]=config["preprocessing_style"]
+            new_instance["labels"]=config["labels"]
+            new_instance["model_path"]=best_model
+
+            found=None
+            for index, config_inst in enumerate(target_config["REST_instances"]):
+                if config_inst["name"] ==  new_instance["name"]:
+                    found=index
+                    break
+            if found != None:
+                del(target_config["REST_instances"][index])
+            target_config["REST_instances"].append(new_instance)
+            
+            with open(config["target_REST_config_path"], 'w') as fp:
+                json.dump(target_config, fp, indent=2)
 
     # Evaluation dataset. 
     model = torch.load(best_model)
