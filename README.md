@@ -37,4 +37,4 @@ python sentiment_analysis.py --train_config_path="train_config.json"
 python sentiment_analysis.py --rest_config_path="REST_config.json"
 
 ### Config file arguments
-* preprocessing_style : "english"(english wikipedia) vs "twitter"(english tweets)
+* preprocessing_style : "english"(english wikipedia) or "twitter"(english tweets)
