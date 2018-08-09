@@ -1,0 +1,17 @@
+{
+  "to_train_instances": [
+    {
+      "name": "EN200Twitter",
+      "language": "EN",
+      "train_dataset_path": "Dataset/SemEval2017/Subtask_A/preprocesed/A_allyears_alldatasets_onlysemval_train90.preprocessed.tsv",
+      "dev_dataset_path": "Dataset/SemEval2017/Subtask_A/preprocesed/A_allyears_alldatasets_onlysemval_dev10.preprocessed.tsv",
+      "test_dataset_path": "Dataset/SemEval2017/Subtask_A/preprocesed/SemEval2017-task4-test.subtask-A.english.preprocessed.tsv",
+      "embeddings_path": "Embeddings/datastories.twitter.200d.txt",
+      "embeddings_size": 200,
+      "preprocessing_style": "twitter",
+      "save_in_REST_config": true,
+      "target_REST_config_path": "Rest_config.json"
+    }
+  ]
+}
+

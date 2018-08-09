@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{a6f87337-38c9-4ead-b25f-0d04125eb550}</ProjectGuid>
+    <ProjectHome />
+    <StartupFile>09_experiments_SA_Cision_Portuguese.py</StartupFile>
+    <SearchPath />
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <InterpreterId>MSBuild|venv|$(MSBuildProjectFullPath)</InterpreterId>
+    <Name>sentiment_analysis</Name>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="LICENSE" />
+    <Content Include="REST_config.json" />
+    <Content Include="ekphrasis\dicts\sentiment\nrc_emolex\NRC-emotion-lexicon-wordlevel-alphabetized-v0.92.txt" />
+    <Content Include="ekphrasis\examples\segmenter_diffs.txt" />
+    <Content Include="ekphrasis\regexes\expressions.txt" />
+    <Content Include="README.md" />
+    <Content Include="requirements.txt" />
+    <Content Include="train_config.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="nn_modules.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="sentiment_analysis.py" />
+    <Compile Include="ekphrasis\classes\exmanager.py" />
+    <Compile Include="ekphrasis\classes\preprocessor.py" />
+    <Compile Include="ekphrasis\classes\segmenter.py" />
+    <Compile Include="ekphrasis\classes\spellcorrect.py" />
+    <Compile Include="ekphrasis\classes\tokenizer.py" />
+    <Compile Include="ekphrasis\classes\__init__.py" />
+    <Compile Include="ekphrasis\dicts\emoticons.py" />
+    <Compile Include="ekphrasis\dicts\noslang\manager.py" />
+    <Compile Include="ekphrasis\dicts\noslang\slangdict.py" />
+    <Compile Include="ekphrasis\dicts\noslang\__init__.py" />
+    <Compile Include="ekphrasis\dicts\sentiment\nrc_emolex\NRCEmolex.py" />
+    <Compile Include="ekphrasis\dicts\sentiment\nrc_emolex\__init__.py" />
+    <Compile Include="ekphrasis\dicts\sentiment\__init__.py" />
+    <Compile Include="ekphrasis\dicts\__init__.py" />
+    <Compile Include="ekphrasis\examples\demo_data.py" />
+    <Compile Include="ekphrasis\examples\demo_ext.py" />
+    <Compile Include="ekphrasis\examples\demo_segmenter.py" />
+    <Compile Include="ekphrasis\examples\demo_tok.py" />
+    <Compile Include="ekphrasis\examples\example.py" />
+    <Compile Include="ekphrasis\examples\sentiment.py" />
+    <Compile Include="ekphrasis\examples\__init__.py" />
+    <Compile Include="ekphrasis\regexes\generate_expressions.py" />
+    <Compile Include="ekphrasis\regexes\__init__.py" />
+    <Compile Include="ekphrasis\tools\generate_stats.py" />
+    <Compile Include="ekphrasis\tools\__init__.py" />
+    <Compile Include="ekphrasis\utils\helpers.py" />
+    <Compile Include="ekphrasis\utils\nlp.py" />
+    <Compile Include="ekphrasis\utils\__init__.py" />
+    <Compile Include="ekphrasis\__init__.py" />
+    <Compile Include="trainer.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="web_server.py">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Dataset\" />
+    <Folder Include="Dataset\SemEval2017\" />
+    <Folder Include="Dataset\SemEval2017\Subtask_A\" />
+    <Folder Include="ekphrasis" />
+    <Folder Include="ekphrasis\classes" />
+    <Folder Include="ekphrasis\dicts" />
+    <Folder Include="ekphrasis\dicts\noslang" />
+    <Folder Include="ekphrasis\dicts\sentiment" />
+    <Folder Include="ekphrasis\dicts\sentiment\nrc_emolex" />
+    <Folder Include="ekphrasis\examples" />
+    <Folder Include="ekphrasis\regexes" />
+    <Folder Include="ekphrasis\stats\" />
+    <Folder Include="ekphrasis\stats\mycorpus" />
+    <Folder Include="ekphrasis\stats\twitter" />
+    <Folder Include="ekphrasis\stats\twitter_pt" />
+    <Folder Include="ekphrasis\tools" />
+    <Folder Include="ekphrasis\utils" />
+    <Folder Include="Embeddings" />
+  </ItemGroup>
+  <ItemGroup>
+    <Interpreter Include="venv\">
+      <Id>venv</Id>
+      <Version>3.6</Version>
+      <Description>venv (Anaconda 4.3.1)</Description>
+      <InterpreterPath>Scripts\python.exe</InterpreterPath>
+      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
+      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
+      <Architecture>X64</Architecture>
+    </Interpreter>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+</Project>

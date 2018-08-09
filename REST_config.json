@@ -1,0 +1,14 @@
+{
+  "REST_instances": [
+    {
+      "name": "EN300Twitter",
+      "language": "EN",
+      "embeddings_path": "Embeddings/datastories.twitter.300d.txt",
+      "embeddings_size": 300,
+      "preprocessing_style": "twitter", 
+      "model": "Models/best_EN300Twitter_model"
+    }
+  ],
+  "port": 7000,
+  "route":"/sentiment_analysis/api/v" 
+}
