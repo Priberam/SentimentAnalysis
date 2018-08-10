@@ -4,7 +4,7 @@
 
 ## Can be used: ## 
 * to process a dataset and report best attained F1-score;
-* as RESTful web service for on-demand sentiment analysis.
+* as RESTful web service for on-demand sentiment analysis (dockerization is also available).
 
 ## The repository contains: ## 
 * links to some pre-trained word embeddings;
@@ -39,3 +39,11 @@ python sentiment_analysis.py --rest_config_path="REST_config.json"
 
 ### Config file arguments
 * preprocessing_style : "english"(english wikipedia) or "twitter"(english tweets)
+
+
+### Automation ## 
+1. Edit the train config file to select the parameters of the models to be trained.
+2. Run the script in the train mode.
+The target REST web service config file will be updated with the trained models. 
+3. Building a docker image afterwards (using provided Dockerfile) will create a running docker image with a REST web service, 
+automatically configured with the trained models (model files and config file).

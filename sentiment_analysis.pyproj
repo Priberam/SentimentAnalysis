@@ -22,6 +22,7 @@
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="Dockerfile" />
     <Content Include="LICENSE" />
     <Content Include="REST_config.json" />
     <Content Include="ekphrasis\dicts\sentiment\nrc_emolex\NRC-emotion-lexicon-wordlevel-alphabetized-v0.92.txt" />
