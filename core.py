@@ -14,10 +14,14 @@ import torch.nn as nn
 from nn_modules import GaussianNoise, RNN
 from sklearn.metrics import f1_score
 import random
+from collections import defaultdict
 
 from ekphrasis.classes.preprocessor import TextPreProcessor
 from ekphrasis.classes.tokenizer import SocialTokenizer
 from ekphrasis.dicts.emoticons import emoticons
+
+def _default_unk_index():
+    return 0
 
 # Load pre-trained embeddings
 def load_embeddings(embeddings_path):
@@ -48,7 +52,9 @@ def load_embeddings(embeddings_path):
             itos.append(word)                
     #id to string: itos
     #string to id: stoi
-    stoi = {word: i for i, word in enumerate(itos)}
+    stoi = defaultdict(_default_unk_index)
+    # stoi is simply a reverse dict for itos
+    stoi.update({token: i for i, token in enumerate(itos)})
     return itos, stoi, vectors, dim
 
 
@@ -109,26 +115,38 @@ def load_instances(config, instances):
         instance.itos, instance.stoi, instance.vectors, instance.embeddings_size = \
             load_embeddings(instance.embeddings_path)
 
-        text = data.Field()
-        text.build_vocab(instance.itos)
-        text.vocab.set_vectors(instance.stoi, instance.vectors, instance.embeddings_size)
+        instance.text = data.Field()
+        instance.text.build_vocab(instance.itos)
+        instance.text.vocab.set_vectors(instance.stoi, instance.vectors, instance.embeddings_size)
     
         instance.model = torch.load(instance.model_path, map_location='cpu' if not cuda_available else None)
         instance.model = instance.model.eval()   
         instances[instance_config["name"]]=instance
 
-def batch_predict(instance, batch_text):
+def batch_predict(instance, batch_text, batch_size=128):
     model = instance.model
     text_processor = instance.text_processor
-    with torch.no_grad():    
-            processed_batch_text = [" ".join(text_processor.pre_process_doc(text)) for text in batch_text]
-            input = torch.LongTensor(\
-                [[instance.stoi[token] for token in processed_text] \
-                    for processed_text in processed_batch_text ])
-            prediction = model(input)
+    processed_batch_texts = [" ".join(text_processor.pre_process_doc(text)) for text in batch_text]
+    
+    Dataset_input = [data.Example.fromlist(data=[processed_batch_text], fields=[('text', instance.text)]) for processed_batch_text in processed_batch_texts]
+    batch_data = data.Dataset(Dataset_input, fields=[('text', instance.text)])
+
+  
+    (batch_data_iter,) = data.BucketIterator.splits([batch_data], 
+        batch_size=batch_size, 
+        sort_key=lambda x: len(x.text),
+        shuffle=False,
+        repeat=False)
+
+    with torch.no_grad():  
+        pred_list = []
+        for batch in batch_data_iter:
+            predictions = model(batch.text)
             top_n, top_i = predictions.topk(1)
             pred = top_i.squeeze(-1).cpu().numpy()
-            return [instance.labels[p] for p in pred]
+            pred_list.append(pred)
+        pred = np.hstack(pred_list)
+        return [instance.labels[p] for p in pred]
 
 def predict(instance, text):
     return batch_predict(instance, [text])[0]
