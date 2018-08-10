@@ -192,11 +192,11 @@ if not __DEBUG__:
 def run_server():
     core.load_instances(REST_config, instances)
 
-    instance = instances["EN300Twitter"]
-    print( core.predict(instance,"why does tom cruise take so many times to figure things out in the movie edge of tomorrow , but gets it right 1 st time in mission impossible ?"))
-    print( core.batch_predict(instance, ["why does tom cruise take so many times to figure things out in the movie edge of tomorrow , but gets it right 1 st time in mission impossible ?", "that sucks . i am forced to listen to kpop on thursday class . i guess my cells in brain are going to die out . "]))
-    
-    if not __DEBUG__:
+    if __DEBUG__:
+        instance = instances["EN300Twitter"]
+        print( core.predict(instance,"why does tom cruise take so many times to figure things out in the movie edge of tomorrow , but gets it right 1 st time in mission impossible ?"))
+        print( core.batch_predict(instance, ["why does tom cruise take so many times to figure things out in the movie edge of tomorrow , but gets it right 1 st time in mission impossible ?", "that sucks . i am forced to listen to kpop on thursday class . i guess my cells in brain are going to die out . "]))
+    else: #if not __DEBUG__:
         app.wsgi_app = LoggingMiddleware(app.wsgi_app)    
         #app.run(debug=True,
         #        host='0.0.0.0',

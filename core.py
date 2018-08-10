@@ -14,7 +14,7 @@ import torch.nn as nn
 from nn_modules import GaussianNoise, RNN
 from sklearn.metrics import f1_score
 import random
-from collections import defaultdict
+from collections import defaultdict, Counter, OrderedDict
 
 from ekphrasis.classes.preprocessor import TextPreProcessor
 from ekphrasis.classes.tokenizer import SocialTokenizer
@@ -26,13 +26,17 @@ def _default_unk_index():
 # Load pre-trained embeddings
 def load_embeddings(embeddings_path):
     itos, vectors, dim = [], array.array(str('d')), None
-    count_embeddings= 0
+    count_embeddings= False
+    num_embeddings=0
     max_vectors=1000000
+    if count_embeddings:
+        with open(embeddings_path, encoding="utf8") as fp:    
+            for line in fp:
+                num_embeddings+=1
+    print("Ignore num elements: number of lines in file was not evaluated.")
     with open(embeddings_path, encoding="utf8") as fp:    
-        for line in fp:
-            count_embeddings+=1
-    with open(embeddings_path, encoding="utf8") as fp:    
-        for index, line in enumerate(tqdm(fp, total=min(max_vectors,count_embeddings))):
+        for index, line in enumerate(tqdm(fp, total=\
+( min(max_vectors,num_embeddings) if count_embeddings else max_vectors))):
             if index > max_vectors:
                 break
             # Explicitly splitting on " " is important, so we don't
@@ -114,9 +118,9 @@ def load_instances(config, instances):
 
         instance.itos, instance.stoi, instance.vectors, instance.embeddings_size = \
             load_embeddings(instance.embeddings_path)
-
+    
         instance.text = data.Field()
-        instance.text.build_vocab(instance.itos)
+        instance.text.build_vocab([instance.itos])
         instance.text.vocab.set_vectors(instance.stoi, instance.vectors, instance.embeddings_size)
     
         instance.model = torch.load(instance.model_path, map_location='cpu' if not cuda_available else None)

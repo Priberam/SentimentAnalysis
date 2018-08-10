@@ -46,7 +46,7 @@ def train(config):
     test = data.TabularDataset(path=config["test_dataset_path"], format='tsv',
                                fields=[('text', TEXT),
                                        ('label', LABEL)])
-    TEXT.build_vocab(train)
+    TEXT.build_vocab([itos])#(train)
     TEXT.vocab.set_vectors(stoi, vectors, dim)
 
     labels_vect = config["labels"]

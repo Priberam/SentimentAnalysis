@@ -26,7 +26,7 @@
       "dropout_rnn_u": 0.3,
       "lr": 0.001,
       "grad_clip": 1,
-      "n_epochs": 15,
+      "n_epochs": 5,
       "batch_size": 128,
       "save_in_REST_config": true,
       "target_REST_config_path": "REST_config.json"

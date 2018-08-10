@@ -11,8 +11,8 @@ class GaussianNoise(nn.Module):
 
     def forward(self, din):
         if self.training:
-            random = torch.randn(din.size()).cuda() if cuda_available else torch.randn(din.size())
-            return din + torch.autograd.Variable(random * self.stddev)
+            random_vec = torch.randn(din.size()).cuda() if cuda_available else torch.randn(din.size())
+            return din + torch.autograd.Variable(random_vec * self.stddev)
         return din
 
 # model inspired from http://aclweb.org/anthology/S17-2126
