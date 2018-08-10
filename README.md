@@ -41,9 +41,38 @@ python sentiment_analysis.py --rest_config_path="REST_config.json"
 * preprocessing_style : "english"(english wikipedia) or "twitter"(english tweets)
 
 
-### Automation ## 
+## Automation ## 
 1. Edit the train config file to select the parameters of the models to be trained.
 2. Run the script in the train mode.
 The target REST web service config file will be updated with the trained models. 
 3. Building a docker image afterwards (using provided Dockerfile) will create a running docker image with a REST web service, 
 automatically configured with the trained models (model files and config file).
+
+```
+docker build -t sentimentanalysis:latest .
+docker run --name sentimentanalysis -d -p 7000:7000 sentimentanalysis
+```
+
+## REST web service routes and input examples ##
+http://<your_machine_ip>:7000/sentiment_analysis/api/v1.0/inference?instance=<model_name>
+```json
+{"text":"Why does Tom Cruise take 10,000 times to figure things out in the movie Edge Of Tomorrow, but gets it right 1st time in Mission Impossible?"
+}
+```
+
+http://<your_machine_ip>:7000/sentiment_analysis/api/v1.0/batch_inference?instance=<model_name>
+```json
+{"texts":
+  ["Who's in Milan in February? You won't want to miss this! #Milano2016 https://t.co/J41jOrpTEa",
+  "@boyalmxghty @WinterSoldierL is a universal feminism concerning everyone, as for taylor swift she may get into that category idk",
+  "I've decided tomorrow night I'm going to re watch all of season 5 of teen wolf",
+  "First the @InfernoCWHL, now the @NHLFlames march in the Pride parade - this is awesome.",
+  "That Mexico vs USA commercial with trump gets your blood boiling. Race war October 10th. Imagine that parking lot. Gaddamnnnnnn VIOLENCE!!!",
+  "\"Happy Captain America Day! David Wright batting 4th tonight. Mets, yo.\"",
+  "Watching The Vow.... For the 4th time.",
+  "LBJ out with cramps. Steps on Chalmers. Cu's ball. Offensive foul. 100-89 Heat ball. 7:57 left in the 4th.",
+  "@FFFabFFFab well destructo is on there and he's not playing. but lineup and hours are released tomorrow.",
+  "\"La Liga: Barca and Betis march on, Malaga held: Real Betis moved up to fourth in the table ... http://t.co/mdYFE4km http://t.co/iDWtFSZF\""
+  ]
+}
+```
