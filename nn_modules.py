@@ -103,5 +103,5 @@ class RNN(nn.Module):
             if self.dropout_final_v > 0:
                 r = self.dropout_final(r)
 
-        return F.log_softmax(self.fc(r.squeeze(0)), dim=1)        
+        return F.log_softmax(self.fc(r), dim=1)        
 
