@@ -5,3 +5,5 @@
 /venv
 /__pycache__
 /.vs
+/*/__pycache__
+/*/*/__pycache__

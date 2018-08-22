@@ -2,23 +2,46 @@
 
 # Sentiment Analysis #
 
-## Can be used: ## 
-* to process a dataset and report best attained F1-score;
-* as RESTful web service for on-demand sentiment analysis (dockerization is also available).
+## Overview
 
-## The repository contains: ## 
+Sentiment Analysis is a natural language processing (NLP) task in which the goal is to 
+assess the polarity/sentiment of a chunk of text. 
+By definition, is widely used in the context of Customer relationship management (CRM), 
+for automatic evaluation of reviews and survey responses, and social media.
+
+Popular substasks in Sentiment Analysis are:
+* Message Polarity Classification: Given a message, classify whether the 
+overall contextual polarity of the message is of positive, negative, or neutral sentiment.
+* Topic-Based or Entity-Based Message Polarity Classification: Given a message and a topic or entity, 
+classify the message towards that topic or entity.
+
+This project currently is targetting only the Message Polarity Classification subtask.
+
+A popular Workshop with a specific task for Sentiment analysis is the SemEval (International Workshop on Semantic Evaluation). 
+Latest year (2017) overview of such task (Task 4) can be reached at: http://www.aclweb.org/anthology/S17-2088
+
+### The repository contains: 
+* code for processing datasets, as well as a RESTful web service for on-demand sentiment analysis (dockerization is also available).
 * links to some pre-trained word embeddings;
 * corpora (from SemEval-2017 Task 4 subtask A).
 
-## Pre-trained word embeddings ## 
+#### Pre-trained word embeddings 
 You can download one of the following word embeddings  (from "DataStories at SemEval-2017 Task 4: Deep LSTM with Attention for Message-level and Topic-based Sentiment Analysis"): 
 - [datastories.twitter.200d.txt](https://mega.nz/#!W5BXBISB!Vu19nme_shT3RjVL4Pplu8PuyaRH5M5WaNwTYK4Rxes): 200 dimensional embeddings
 - [datastories.twitter.300d.txt](https://mega.nz/#!u4hFAJpK!UeZ5ERYod-SwrekW-qsPSsl-GYwLFQkh06lPTR7K93I): 300 dimensional embeddings
 
 Place the file(s) in the `Embeddings` folder.
 
+## Model
+The implemented model is a Deep Bidirectional LSTM model with Attention, based on the work of Baziotis et al., 2017: 
+[DataStories at SemEval-2017 Task 4: Deep LSTM with Attention for Message-level and Topic-based Sentiment Analysis](http://aclweb.org/anthology/S17-2126) |
 
-## Create a virtualenv ## 
+## Installation
+
+### Requirements
+Besides PyTorch, the required libraries are listed in `requirements.txt`.
+
+### Setting up a virtual environment
 Linux  | Windows
 ------------- | -------------
 pip install virtualenv  | pip install virtualenv
@@ -31,6 +54,11 @@ pip install torchtext==0.2.3  | pip install torchtext==0.2.3
 
 (1)* replace "cpu" in link if you plan to use GPU: "cu80" for CUDA 8, "cu90" for CUDA 9.0, "cu92" for CUDA 9.2, ...
 
+_If you require a newer version,
+please visit http://pytorch.org/ and follow their instructions to install the relevant pytorch binary._
+
+
+## Running
 
 ### Train ## 
 python sentiment_analysis.py --train_config_path="train_config.json"
@@ -38,13 +66,18 @@ python sentiment_analysis.py --train_config_path="train_config.json"
 python sentiment_analysis.py --rest_config_path="REST_config.json"
 
 ### Config file arguments
-* preprocessing_style : "english"(english wikipedia) or "twitter"(english tweets)
-
+#### Train config file
+* `name` : model name
+* `labels` : list of the target labels, matching the train, dev and test datasets
+* `embeddings_path` : path for embeddings
+* `preprocessing_style` : "english"(english wikipedia) or "twitter"(english tweets)
+* `save_in_REST_config` : true, to update target REST config file with trained models, or false
+* `target_REST_config_path` : path of target REST config file
 
 ## Automation ## 
 1. Edit the train config file to select the parameters of the models to be trained.
-2. Run the script in the train mode.
-The target REST web service config file will be updated with the trained models. 
+2. Run the script in the train mode (see how above).
+The target REST web service config file will be updated with the trained models, if `save_in_REST_config` is set to true. 
 3. Building a docker image afterwards (using provided Dockerfile) will create a running docker image with a REST web service, 
 automatically configured with the trained models (model files and config file).
 
@@ -76,3 +109,21 @@ http://<your_machine_ip>:7000/sentiment_analysis/api/v1.0/batch_inference?instan
   ]
 }
 ```
+
+
+## Team
+[Priberam] (http://priberam.com) is a Portuguese SME founded in 1989, as a spin-off from Instituto Superior
+Técnico in Lisbon, which offers cutting-edge semantic search and natural language
+processing technologies. 
+Priberam licenses its technologies to clients such as Amazon and
+Microsoft and the biggest media publishers in Portugal, Brazil and Spain.
+Priberam participates in several national and European R&D projects and keeps strong
+links with the best groups in the academia and research institutes. 
+
+Priberam Labs, the company’s research department (http://labs.priberam.com), is focused
+on innovative technologies such as automatic media monitoring, recommendation, and
+social media analysis, with a strong component on machine learning research for Big
+Data. 
+
+To learn more about who specifically contributed to this codebase, 
+see [our contributors](https://github.com/priberam/SentimentAnalysis/graphs/contributors) page.
