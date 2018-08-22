@@ -15,10 +15,10 @@ overall contextual polarity of the message is of positive, negative, or neutral 
 * Topic-Based or Entity-Based Message Polarity Classification: Given a message and a topic or entity, 
 classify the message towards that topic or entity.
 
-This project currently is targetting only the Message Polarity Classification subtask.
-
 A popular Workshop with a specific task for Sentiment analysis is the SemEval (International Workshop on Semantic Evaluation). 
 Latest year (2017) overview of such task (Task 4) can be reached at: http://www.aclweb.org/anthology/S17-2088
+
+This project currently is targetting only the Message Polarity Classification subtask.
 
 ### The repository contains: 
 * code for processing datasets, as well as a RESTful web service for on-demand sentiment analysis (dockerization is also available).
@@ -112,15 +112,15 @@ http://<your_machine_ip>:7000/sentiment_analysis/api/v1.0/batch_inference?instan
 
 
 ## Team
-[Priberam] (http://priberam.com) is a Portuguese SME founded in 1989, as a spin-off from Instituto Superior
-Técnico in Lisbon, which offers cutting-edge semantic search and natural language
+[Priberam](http://priberam.com) is a Portuguese SME founded in 1989, as a spin-off from Instituto Superior
+TÃ©cnico in Lisbon, which offers cutting-edge semantic search and natural language
 processing technologies. 
 Priberam licenses its technologies to clients such as Amazon and
 Microsoft and the biggest media publishers in Portugal, Brazil and Spain.
 Priberam participates in several national and European R&D projects and keeps strong
 links with the best groups in the academia and research institutes. 
 
-Priberam Labs, the company’s research department (http://labs.priberam.com), is focused
+Priberam Labs, the companyâ€™s research department (http://labs.priberam.com), is focused
 on innovative technologies such as automatic media monitoring, recommendation, and
 social media analysis, with a strong component on machine learning research for Big
 Data. 
