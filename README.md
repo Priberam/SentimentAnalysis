@@ -16,9 +16,9 @@ overall contextual polarity of the message is of positive, negative, or neutral 
 classify the message towards that topic or entity.
 
 A popular Workshop with a specific task for Sentiment analysis is the SemEval (International Workshop on Semantic Evaluation). 
-Latest year (2017) overview of such task (Task 4) can be reached at: http://www.aclweb.org/anthology/S17-2088
+Latest year (2017) overview of such task (Task 4) can be reached at: http://www.aclweb.org/anthology/S17-2088.
 
-This project currently is targetting only the Message Polarity Classification subtask.
+This project currently is targeting only the Message Polarity Classification subtask.
 
 ### The repository contains: 
 * code for processing datasets, as well as a RESTful web service for on-demand sentiment analysis (dockerization is also available).
@@ -34,7 +34,7 @@ Place the file(s) in the `Embeddings` folder.
 
 ## Model
 The implemented model is a Deep Bidirectional LSTM model with Attention, based on the work of Baziotis et al., 2017: 
-[DataStories at SemEval-2017 Task 4: Deep LSTM with Attention for Message-level and Topic-based Sentiment Analysis](http://aclweb.org/anthology/S17-2126) |
+[DataStories at SemEval-2017 Task 4: Deep LSTM with Attention for Message-level and Topic-based Sentiment Analysis](http://aclweb.org/anthology/S17-2126).
 
 ## Installation
 
@@ -60,23 +60,46 @@ please visit http://pytorch.org/ and follow their instructions to install the re
 
 ## Running
 
-### Train ## 
-python sentiment_analysis.py --train_config_path="train_config.json"
-### Run as a web service ## 
-python sentiment_analysis.py --rest_config_path="REST_config.json"
+### Train
+To train a new model, one can just use the pre-configured config file "train_config.json".
+After making the appropriate modifications, like for example, 
+changing the target embeddings file, execute the following command in the terminal:
 
-### Config file arguments
-#### Train config file
+```
+python sentiment_analysis.py --train_config_path="train_config.json"
+```
+#### Train config file arguments
 * `name` : model name
 * `labels` : list of the target labels, matching the train, dev and test datasets
 * `embeddings_path` : path for embeddings
 * `preprocessing_style` : "english"(english wikipedia) or "twitter"(english tweets)
-* `save_in_REST_config` : true, to update target REST config file with trained models, or false
+* `save_in_REST_config` : true, to update target REST config file with trained models, or false, otherwise
 * `target_REST_config_path` : path of target REST config file
+* `batch_size` : number of samples that going to be propagated through the network, on each iteration.
+  Assuming that the dataset has `T` training samples, and the `batch_size` is set to `B`, 
+  the algorithm takes the first `B` samples (from 1st to `B`th) from the training dataset and trains the network. 
+  Next it takes the following `B` samples  and trains the network again, 
+  until all the samples have been propagated through the network;
+* `hidden_dim` : hidden dimension of the LSTM layers 
+(number of features in the hidden state h);     
+* `num_layers` : number of recurrent layers in the LSTM. E.g., setting `num_layers`
+would mean stacking two LSTMs together to form a "stacked LSTM",
+with the second LSTM taking in outputs of the first LSTM and
+computing the final results.
 
-## Automation ## 
+
+### Run as a web service  
+To load the trained models and launch a web service for on-demand sentiment analysis, 
+execute the following command in the terminal:
+
+```
+python sentiment_analysis.py --rest_config_path="REST_config.json"
+```
+
+
+## Automated procedure
 1. Edit the train config file to select the parameters of the models to be trained.
-2. Run the script in the train mode (see how above).
+2. Run the script in the train mode (see how above). 
 The target REST web service config file will be updated with the trained models, if `save_in_REST_config` is set to true. 
 3. Building a docker image afterwards (using provided Dockerfile) will create a running docker image with a REST web service, 
 automatically configured with the trained models (model files and config file).
@@ -86,29 +109,48 @@ docker build -t sentimentanalysis:latest .
 docker run --name sentimentanalysis -d -p 7000:7000 sentimentanalysis
 ```
 
-## REST web service routes and input examples ##
-http://<your_machine_ip>:7000/sentiment_analysis/api/v1.0/inference?instance=<model_name>
-```json
-{"text":"Why does Tom Cruise take 10,000 times to figure things out in the movie Edge Of Tomorrow, but gets it right 1st time in Mission Impossible?"
-}
+It is not necessary to create a docker to test and run the web service. 
+It is just an extra, that allows developers to package up an application 
+with all of the parts it needs. 
+[Docker](https://www.docker.com/) is a "containerization" technology 
+that offers virtual isolation to deploy and run applications 
+that access a shared operating system (OS) kernel without the need for virtual machines (VMs).
+
+## REST web service routes and input examples 
+Here's an example of a POST request for a single text chunk classification:
+```bash
+curl -X POST \
+  'http://<your_machine_ip>:<selected_port>/sentiment_analysis/api/v1.0/inference?instance=<model_name>' \
+  -H 'Cache-Control: no-cache' \
+  -H 'Content-Type: application/json' \
+  -H 'Postman-Token: 3322b9bf-fe4d-4856-8871-834394aa1124' \
+  -d '{"text":"Why does Tom Cruise take 10,000 times to figure things out in the movie Edge Of Tomorrow, but gets it right 1st time in Mission Impossible?"
+} '
 ```
 
-http://<your_machine_ip>:7000/sentiment_analysis/api/v1.0/batch_inference?instance=<model_name>
-```json
-{"texts":
-  ["Who's in Milan in February? You won't want to miss this! #Milano2016 https://t.co/J41jOrpTEa",
+
+And here's an example of a POST request for a batch of text chunks to classify:
+```bash
+curl -X POST \
+  'http://<your_machine_ip>:7000/sentiment_analysis/api/v1.0/batch_inference?instance=<model_name>' \
+  -H 'Cache-Control: no-cache' \
+  -H 'Content-Type: application/json' \
+  -H 'Postman-Token: 3da2204c-f9ae-42f0-9ae6-8d4622129ca3' \
+  -d '{"texts":
+  ["Who'\''s in Milan in February? You won'\''t want to miss this! #Milano2016 https://t.co/J41jOrpTEa",
   "@boyalmxghty @WinterSoldierL is a universal feminism concerning everyone, as for taylor swift she may get into that category idk",
-  "I've decided tomorrow night I'm going to re watch all of season 5 of teen wolf",
+  "I'\''ve decided tomorrow night I'\''m going to re watch all of season 5 of teen wolf",
   "First the @InfernoCWHL, now the @NHLFlames march in the Pride parade - this is awesome.",
   "That Mexico vs USA commercial with trump gets your blood boiling. Race war October 10th. Imagine that parking lot. Gaddamnnnnnn VIOLENCE!!!",
   "\"Happy Captain America Day! David Wright batting 4th tonight. Mets, yo.\"",
   "Watching The Vow.... For the 4th time.",
-  "LBJ out with cramps. Steps on Chalmers. Cu's ball. Offensive foul. 100-89 Heat ball. 7:57 left in the 4th.",
-  "@FFFabFFFab well destructo is on there and he's not playing. but lineup and hours are released tomorrow.",
+  "LBJ out with cramps. Steps on Chalmers. Cu'\''s ball. Offensive foul. 100-89 Heat ball. 7:57 left in the 4th.",
+  "@FFFabFFFab well destructo is on there and he'\''s not playing. but lineup and hours are released tomorrow.",
   "\"La Liga: Barca and Betis march on, Malaga held: Real Betis moved up to fourth in the table ... http://t.co/mdYFE4km http://t.co/iDWtFSZF\""
   ]
-}
+} '
 ```
+
 
 
 ## Team
@@ -120,7 +162,7 @@ Microsoft and the biggest media publishers in Portugal, Brazil and Spain.
 Priberam participates in several national and European R&D projects and keeps strong
 links with the best groups in the academia and research institutes. 
 
-Priberam Labs, the company’s research department (http://labs.priberam.com), is focused
+[Priberam Labs](http://labs.priberam.com), the company’s research department, is focused
 on innovative technologies such as automatic media monitoring, recommendation, and
 social media analysis, with a strong component on machine learning research for Big
 Data. 
