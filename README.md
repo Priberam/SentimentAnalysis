@@ -120,7 +120,7 @@ that access a shared operating system (OS) kernel without the need for virtual m
 Here's an example of a POST request for a single text chunk classification:
 ```bash
 curl -X POST \
-  'http://<your_machine_ip>:<selected_port>/sentiment_analysis/api/v1.0/inference?instance=<model_name>' \
+  'http://localhost:7000/sentiment_analysis/api/v1.0/inference?instance=EN300Twitter' \
   -H 'Cache-Control: no-cache' \
   -H 'Content-Type: application/json' \
   -H 'Postman-Token: 3322b9bf-fe4d-4856-8871-834394aa1124' \
@@ -132,7 +132,7 @@ curl -X POST \
 And here's an example of a POST request for a batch of text chunks to classify:
 ```bash
 curl -X POST \
-  'http://<your_machine_ip>:7000/sentiment_analysis/api/v1.0/batch_inference?instance=<model_name>' \
+  'http://localhost:7000/sentiment_analysis/api/v1.0/inference?instance=EN300Twitter' \
   -H 'Cache-Control: no-cache' \
   -H 'Content-Type: application/json' \
   -H 'Postman-Token: 3da2204c-f9ae-42f0-9ae6-8d4622129ca3' \
